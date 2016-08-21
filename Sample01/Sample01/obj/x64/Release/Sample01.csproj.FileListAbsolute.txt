@@ -1,0 +1,6 @@
+C:\Users\KUWABATA\Documents\Visual Studio 2015\Projects\Sample01\Sample01\bin\x64\Release\Sample01.exe.config
+C:\Users\KUWABATA\Documents\Visual Studio 2015\Projects\Sample01\Sample01\bin\x64\Release\Sample01.exe
+C:\Users\KUWABATA\Documents\Visual Studio 2015\Projects\Sample01\Sample01\bin\x64\Release\Sample01.pdb
+C:\Users\KUWABATA\Documents\Visual Studio 2015\Projects\Sample01\Sample01\obj\x64\Release\Sample01.exe
+C:\Users\KUWABATA\Documents\Visual Studio 2015\Projects\Sample01\Sample01\obj\x64\Release\Sample01.pdb
+C:\Users\KUWABATA\Documents\Visual Studio 2015\Projects\Sample01\Sample01\obj\x64\Release\Sample01.csprojResolveAssemblyReference.cache
