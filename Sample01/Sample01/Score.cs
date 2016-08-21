@@ -23,6 +23,8 @@ namespace Sample01
         int p_index;
         List<int> score_stack = new List<int>();
         List<char> status_stack = new List<char>();
+        List<StringBuilder> str_stack = new List<StringBuilder>();
+        Dictionary<Tuple<int,int>, Tuple<int, String>> score_map = new Dictionary<Tuple<int, int>, Tuple<int, String>>();
 
         public Score(int s, StringBuilder s_str, int m_in, char sta, Motif moti, String fast, int p_in, int well)
         {
@@ -261,11 +263,17 @@ namespace Sample01
 
 
 
-        public int exam_scrore()
+        public Tuple<int, string> exam_scrore()
         {
-
-
             bool end = false;
+            if (score_map.ContainsKey(Tuple.Create(m_index, p_index)))
+            {
+                Tuple<int, string> i_s = score_map[Tuple.Create(m_index, p_index)];
+                score += i_s.Item1;
+                score_str.Append(i_s.Item2);
+                end = true;
+            }
+           
             
             //Console.Write(fasta.Length);
             //Console.Write(status);
@@ -332,7 +340,7 @@ namespace Sample01
                 end = true;
             }
             //枝刈りと終了だったものの巻き戻し
-            //onsole.WriteLine(score + motif.cutoff_score_list[m_index] + " < " + well_score + "\t" + new String(status_stack.ToArray()) + " " + score_str +"あ");
+            //Console.WriteLine(score + motif.cutoff_score_list[m_index] + " < " + well_score + "\t" + new String(status_stack.ToArray()) + "\t" + score_str);
             if (((score + motif.cutoff_score_list[m_index]) < well_score) || end || (motif.length - m_index > fasta.Length - p_index && score + motif.cutoff_score_list[m_index] - motif.cutoff_score_list[m_index + fasta.Length - p_index] < well_score))//今のスコア+今後のマッチ数で最大加算されるスコア < 現在の優秀スコア
             {
                 //Console.Write(end.ToString() + "い");
@@ -352,11 +360,13 @@ namespace Sample01
                     //m_index--;
                     p_index--;
                 }
+                Tuple<int, string> t = new Tuple<int, string>(score - score_stack[score_stack.Count - 1], score_str.ToString().Substring(str_stack[str_stack.Count-1].Length-1));
                 //ステータスとスコアと文字列をを前に戻す
                 if (score_stack.Count != 0)
                 {
                     score = score_stack[score_stack.Count - 1];
                     status = status_stack[status_stack.Count - 1];
+                    score_str = str_stack[str_stack.Count - 1];
                     if (status == 'B')
                     {
                         status_stack.RemoveAt(status_stack.Count - 1);
@@ -364,7 +374,29 @@ namespace Sample01
                     }
                     score_str.Remove(score_str.Length - 1, 1);
                 }
-                return -1;
+                if (end)
+                {
+                    if (score_map.ContainsKey(Tuple.Create<int, int>(m_index, p_index)))
+                    {
+                        if (score_map[Tuple.Create<int, int>(m_index, p_index)].Item1 < t.Item1)
+                        {
+                            score_map[Tuple.Create<int, int>(m_index, p_index)] = t;
+                            Console.Write("\t" + m_index + " " + p_index + " " + score_map[Tuple.Create<int, int>(m_index, p_index)].Item1 + " " + score_map[Tuple.Create<int, int>(m_index, p_index)].Item2);
+                            Console.WriteLine();
+                        }
+                    }
+                    else
+                    {
+                        score_map[Tuple.Create<int, int>(m_index, p_index)] = t;
+                        Console.Write("\t" + m_index + " " + p_index + " " + score_map[Tuple.Create<int, int>(m_index, p_index)].Item1 + " " + score_map[Tuple.Create<int, int>(m_index, p_index)].Item2);
+                        Console.WriteLine();
+                    }
+                    return t;
+                }
+                else
+                {
+                    return null;
+                }
             }
             //if(motif.length - m_index > fasta.Length - p_index)
             //{
@@ -375,8 +407,10 @@ namespace Sample01
 
             score_stack.Add(score);
             status_stack.Add(status);
+            str_stack.Add(score_str);
+            //str_stack.Add(score_str);
             //Console.WriteLine(status + " " + score_str);
-            
+            Tuple<int, string> tm=null, ti = null, td = null;
             if (motif.score_I.ContainsKey(m_index))
             {
 
@@ -401,7 +435,7 @@ namespace Sample01
                         score_str.Append(fasta[p_index].ToString());
                         m_index++;
                         p_index++;
-                        exam_scrore();
+                        tm = exam_scrore();
                     }
                     if (motif.score_I[m_index].ContainsKey(status + "D"))
                     {
@@ -414,7 +448,7 @@ namespace Sample01
                         score_str.Append("-");
                         m_index++;
                         //p_index++;
-                        exam_scrore();
+                        td = exam_scrore();
                     }
                     if (motif.score_I[m_index].ContainsKey(status + "I"))
                     {
@@ -457,7 +491,7 @@ namespace Sample01
                             score_str.Append(fasta[p_index].ToString().ToLower());
                             //m_index++;
                             p_index++;
-                            exam_scrore();
+                            ti = exam_scrore();
                         }
                     }
                 }
@@ -490,7 +524,7 @@ namespace Sample01
                     score_str.Append(fasta[p_index].ToString());
                     m_index++;
                     p_index++;
-                    exam_scrore();
+                    tm = exam_scrore();
                 }
                 if (motif.score_I[m_index].ContainsKey("BD") && m_index == 0)
                 {
@@ -513,7 +547,7 @@ namespace Sample01
                     score_str.Append("-");
                     m_index++;
                     //p_index++;
-                    exam_scrore();
+                    td = exam_scrore();
                 }
                 if (motif.score_I[m_index].ContainsKey("BI") && m_index == 0)
                 {
@@ -547,7 +581,7 @@ namespace Sample01
                     score_str.Append(fasta[p_index].ToString().ToLower());
                     //m_index++;
                     p_index++;
-                    exam_scrore();
+                    ti = exam_scrore();
                 }
 
 
@@ -571,8 +605,43 @@ namespace Sample01
                 score_str.Append(fasta[p_index].ToString());
                 m_index++;
                 p_index++;
-                exam_scrore();
+                tm = exam_scrore();
             }
+
+            Tuple<int, string> tw_b = null;
+            if (tm != null)
+            {
+                tw_b = tm;
+            }
+            if (ti != null && tw_b.Item1 < ti.Item1)
+            {
+                tw_b = ti;
+            }
+            if (td != null && tw_b.Item1 < td.Item1)
+            {
+                tw_b = td;
+            }
+            Tuple<int, string> tw = null;
+            if (tw_b != null && score_stack.Count!=0)
+            {
+                tw = new Tuple<int,string>(tw_b.Item1 + score - score_stack[score_stack.Count -1],tw_b.Item2.ToString() + score_str.ToString().Substring(score_str.ToString().Length-1));
+                if (score_map.ContainsKey(Tuple.Create<int, int>(m_index, p_index)) )
+                {
+                    if (score_map[Tuple.Create<int, int>(m_index, p_index)].Item1 < tw.Item1)
+                    {
+                        score_map[Tuple.Create<int, int>(m_index, p_index)] = tw;
+                        Console.Write("\t" + m_index + " " + p_index + " " + score_map[Tuple.Create<int, int>(m_index, p_index)].Item1 + " " + score_map[Tuple.Create<int, int>(m_index, p_index)].Item2);
+                        Console.WriteLine();
+                    }
+                }else
+                {
+                    score_map[Tuple.Create<int, int>(m_index, p_index)] = tw;
+                    Console.Write("\t" + m_index + " " + p_index + " " + score_map[Tuple.Create<int, int>(m_index, p_index)].Item1 + " " + score_map[Tuple.Create<int, int>(m_index, p_index)].Item2);
+                    Console.WriteLine();
+                }
+                
+            }
+
             if (status == 'M')
             {
                 m_index--;
@@ -588,10 +657,11 @@ namespace Sample01
                 //m_index--;
                 p_index--;
             }
-          
+
+            
+            //ステータスとスコアと文字列をを前に戻す
             score_stack.RemoveAt(score_stack.Count - 1);
             status_stack.RemoveAt(status_stack.Count - 1);
-            //ステータスとスコアと文字列をを前に戻す
             if (score_stack.Count != 0)
             {
                 score = score_stack[score_stack.Count - 1];
@@ -602,9 +672,10 @@ namespace Sample01
                     status = status_stack[status_stack.Count - 1];
                 }
                 score_str.Remove(score_str.Length - 1, 1);
-            }
-            
-            return 0;
+            }            
+            return tw;
+
+
         }
 
     }
