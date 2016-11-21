@@ -17,15 +17,15 @@ namespace Sample01
             Encoding utf8Enc = Encoding.UTF8;
             StreamWriter writer =
               new StreamWriter(@"result.txt", false, System.Text.Encoding.GetEncoding("Shift_JIS"));
-            StreamWriter EF =
-              new StreamWriter(@"protein_EF2.txt", false, System.Text.Encoding.GetEncoding("Shift_JIS"));
-            StreamWriter two_best =
-              new StreamWriter(@"tow_best.txt", false, System.Text.Encoding.GetEncoding("utf-8"));
-            StreamWriter test =
-              new StreamWriter(@"test_aa.txt", false, System.Text.Encoding.GetEncoding("utf-8"));
-            
+            //StreamWriter EF =
+            //  new StreamWriter(@"protein_EF2.txt", false, System.Text.Encoding.GetEncoding("Shift_JIS"));
+            //StreamWriter two_best =
+            //  new StreamWriter(@"tow_best.txt", false, System.Text.Encoding.GetEncoding("utf-8"));
+            //StreamWriter test =
+            //  new StreamWriter(@"test_aa.txt", false, System.Text.Encoding.GetEncoding("utf-8"));
+
             StreamWriter top = new StreamWriter(@"top.txt", false, System.Text.Encoding.GetEncoding("utf-8"));
-            StreamWriter cut = new StreamWriter(@"cut.txt", false, System.Text.Encoding.GetEncoding("utf-8"));
+            //StreamWriter cut = new StreamWriter(@"cut.txt", false, System.Text.Encoding.GetEncoding("utf-8"));
             //Console.SetOut(writer);
             //writer.WriteLine("テスト書き込みです。");
             //List<StringBuilder> fasta = new List<StringBuilder>();
@@ -53,7 +53,7 @@ namespace Sample01
                     string line;
                     StringBuilder buf_title = new StringBuilder();
                     StringBuilder buf_main = new StringBuilder();
-                    String buf_id="test" ;
+                    String buf_id = "test";
                     int a = 0;
                     while ((line = r.ReadLine()) != null) // 1行ずつ読み出し。
                     {
@@ -87,13 +87,13 @@ namespace Sample01
                             }
                             else
                             {
-                                buf_id = Entry.ValidFileName( buf_title.ToString());
+                                buf_id = Entry.ValidFileName(buf_title.ToString());
                             }
-                            
+
                             a = 1;
                         }
                         else
-                        {                           
+                        {
                             //fasta[fasta.Count - 1].Append(line);
                             buf_main.Append(line);
                         }
@@ -104,10 +104,10 @@ namespace Sample01
                 }
             }
 
-            foreach(KeyValuePair<string,Entry> e in entrys)
-            {
-                test.Write(e.Value.id);
-            }
+            //foreach(KeyValuePair<string,Entry> e in entrys)
+            //{
+            //    test.Write(e.Value.id);
+            //}
 
             string[] motif_fs = System.IO.Directory.GetFiles(@"prosite", "*", System.IO.SearchOption.AllDirectories);
             List<StringBuilder> motifs = new List<StringBuilder>();
@@ -155,13 +155,13 @@ namespace Sample01
             {
                 motif.Add(new Motif(f_m.ToString()));
             }
-            
-            int index = 0;
+
+            //int index = 0;
             System.Diagnostics.Stopwatch alltime = System.Diagnostics.Stopwatch.StartNew();
 
             Dictionary<string, Dictionary<string, Dictionary<int, Score>>> sco = new Dictionary<string, Dictionary<string, Dictionary<int, Score>>>();
             //for (int i = 0; i < fasta.Count; i++)
-            foreach(KeyValuePair<string,Entry> entry in entrys)
+            foreach (KeyValuePair<string, Entry> entry in entrys)
             {
 
                 foreach (Motif query in motif)
@@ -183,7 +183,7 @@ namespace Sample01
             {
                 cnt++;
                 string resfolder = "result";
-                
+
                 resfolder = System.IO.Path.Combine("result", entry.Value.id);
                 if (!Directory.Exists(resfolder))
                 {
@@ -194,7 +194,7 @@ namespace Sample01
                     Directory.CreateDirectory(System.IO.Path.Combine("result", "protein"));
                 }
 
-                bool diff = true;
+                //bool diff = true;
                 if (File.Exists(System.IO.Path.Combine(System.IO.Path.Combine("result", "protein"), entry.Value.id + ".fasta")))
                 {
                     //StreamReader r = new StreamReader(System.IO.Path.Combine(System.IO.Path.Combine("result", "protein"), entry.Value.id + ".fasta"));
@@ -221,8 +221,8 @@ namespace Sample01
                 }
 
             }
-            test.WriteLine("");
-            test.WriteLine(cnt);
+            //test.WriteLine("");
+            //test.WriteLine(cnt);
             for (int i = 0; i < motif.Count; i++)
             {
                 string motif_name = motif[i].ac.ToString() + ".profile";
@@ -265,238 +265,256 @@ namespace Sample01
             {
                 Directory.CreateDirectory("result");
             }
-           
+
 
             ParallelOptions options = new ParallelOptions();
-            options.MaxDegreeOfParallelism = 8;
+            options.MaxDegreeOfParallelism = 24;
             //int all = fasta.Count * motif.Count;
-            int all = entrys.Count* motif.Count;
+            int all = entrys.Count * motif.Count;
             int n = 0;
             Console.Write("fasta" + entrys.Count + "title" + fasta_title.Count);
-            Parallel.ForEach(entrys,options, entry =>
-            {
+            Parallel.ForEach(entrys, options, entry =>
+             {
 
-                string resfolder = "result";                               
-                resfolder = System.IO.Path.Combine("result", entry.Value.id);
+                 string resfolder = "result";
+                 resfolder = System.IO.Path.Combine("result", entry.Value.id);
+                 Console.WriteLine(n + "/" + all + " " + entry.Value.title.ToString());
 
-                foreach (Motif query in motif)
-                {
+                 foreach (Motif query in motif)
+                 {
 
-                    Console.WriteLine(n + "/" + all + " " + entry.Value.title.ToString() + " vs " + query.ac.ToString() + query.title.ToString());
+                    //Console.WriteLine(n + "/" + all + " " + entry.Value.title.ToString() + " vs " + query.ac.ToString() + query.title.ToString());
                     string resfile = System.IO.Path.Combine(resfolder, query.ac.ToString() + ".out");
-                    Dictionary<int, Score> buf_score = new Dictionary<int, Score>();
-                    Console.WriteLine(entry.Value.main.ToString());
+                     Dictionary<int, Score> buf_score = new Dictionary<int, Score>();
+                    //Console.WriteLine(entry.Value.main.ToString());
                     if (File.Exists(resfile))
-                    {
+                     {
                         //sco[fasta_title[i].ToString()][query.title.ToString()] = Score.read_result(resfile);
-                        buf_score = Score.read_result(resfile);
+                        //buf_score = Score.read_result(resfile);
                     }
-                    else
-                    {
+                     else
+                     {
                         //sco[fasta_title[i].ToString()][query.title.ToString()] = new Dictionary<int, Score>();
                         //以下一時的にコメント
                         buf_score = query.ExamScore(entry.Value.main.ToString());
-                        string resoutfile = System.IO.Path.Combine(resfolder, query.ac.ToString() + ".out");
-                        StreamWriter p_m_result =
-                            new StreamWriter(resoutfile, false, Encoding.GetEncoding("utf-8"));
-                        p_m_result.WriteLine("protein,motif,start,end,score,string");
+                         string resoutfile = System.IO.Path.Combine(resfolder, query.ac.ToString() + ".out");
+
+                         StringBuilder f_out = new StringBuilder();
+                         f_out.AppendLine("protein,motif,start,end,score,string");
+                        //p_m_result.WriteLine("protein,motif,start,end,score,string");
                         //foreach (KeyValuePair<int, Score> s in sco[fasta_title[i].ToString()][query.title.ToString()])
                         foreach (KeyValuePair<int, Score> s in buf_score)
-                        {
+                         {
                             //if (s.Value.score > query.cutoff[query.low_cutoff_level])
-                            if (query.exam_Nscore(query.low_cutoff_level,s.Value) > 0)
-                            {
-                                p_m_result.WriteLine(entry.Value.id + "," + query.ac.ToString() + "," + s.Value.start + "," + s.Value.end + "," + s.Value.score + "," + s.Value.score_str);
+                            if (query.exam_Nscore(query.low_cutoff_level, s.Value) > 0)
+                             {
+                                 f_out.AppendLine(entry.Value.id + "," + query.ac.ToString() + "," + s.Value.start + "," + s.Value.end + "," + s.Value.score + "," + s.Value.score_str);
+                                //p_m_result.WriteLine(entry.Value.id + "," + query.ac.ToString() + "," + s.Value.start + "," + s.Value.end + "," + s.Value.score + "," + s.Value.score_str);
                             }
-                        }
-                        p_m_result.Close();
-                    }
-                    n++;
+                         }
+                        //cut.Write(f_out);
+                        //cut.Close();
+                        StreamWriter p_m_result =
+                             new StreamWriter(resoutfile, false, Encoding.GetEncoding("utf-8"));
+                         p_m_result.Write(f_out);
+                         p_m_result.Close();
+                     }
 
-                    Console.WriteLine(alltime.Elapsed);
+
+                    //Console.WriteLine(alltime.Elapsed);
                 }
+                 n++;
+                 Console.WriteLine(alltime.Elapsed);
 
-            });
+             });
             Console.WriteLine(alltime.Elapsed);
 
-            int e_in=-1;
-            Dictionary<int, StreamWriter> top_level_dic = new Dictionary<int, StreamWriter>();
-            top_level_dic[0] =  new StreamWriter(@"top_level0.txt", false, System.Text.Encoding.GetEncoding("utf-8"));
-            top_level_dic[-1] = new StreamWriter(@"top_level-1.txt", false, System.Text.Encoding.GetEncoding("utf-8"));
-            //for (int i = 0; i < fasta.Count; i++)
-            foreach (KeyValuePair<string, Entry> entry in entrys)
-            {
-                e_in++;
-                score_list[score_list.Count] = new Dictionary<int, Dictionary<int, Score>>();
-                int m_in = -1;
-                Dictionary<int, Dictionary<string, Score>> best_score = new Dictionary<int, Dictionary<string, Score>>();
-                foreach (Motif query in motif)
-                {
-                    m_in++;
-                    //Console.Write(i + " / " + fasta.Count + "  " + m_in + " / " + motif.Count);
-                    //Console.WriteLine("エントリー名" + fasta_title[i] + "vs" + "モチーフタイトル" + query.title.ToString() + "AC=" + query.ac.ToString());
-                    Console.Write(e_in + " / " + entrys.Count + "  " + m_in + " / " + motif.Count);
-                    Console.WriteLine("エントリー名" + entry.Value.title+ "vs" + "モチーフタイトル" + query.title.ToString() + "AC=" + query.ac.ToString());
-                    Dictionary<int , bool> level_write = new Dictionary<int, bool>();
-                    level_write[0] = false;
-                    level_write[-1] = false;
-                    System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
-                    Dictionary<int, Score> cutoff_score = new Dictionary<int, Score>();
 
-                    //上の流用
-                    string resfolder = "result";
-                    
-                    resfolder = System.IO.Path.Combine("result", entry.Value.id);
-                    string resfile = System.IO.Path.Combine(resfolder, query.ac.ToString() + ".out");
-                    Dictionary<int, Score> buf_score = new Dictionary<int, Score>();
-                    Console.WriteLine(resfile);
-                    if (File.Exists(resfile))
-                    {
-                        //sco[entry.Value.title.ToString()][query.title.ToString()] = Score.read_result(resfile);
-                        buf_score = Score.read_result(resfile);
-                    }
-                    else
-                    {
-                        //sco[entry.Value.title.ToString()][query.title.ToString()] = new Dictionary<int, Score>();
-                        buf_score = Score.read_result(resfile);
-                    }
-                    //上の流用
-
-                    //foreach (KeyValuePair<int, Score> cs in sco[entry.Value.title.ToString()][query.title.ToString()])
-                    foreach (KeyValuePair<int, Score> cs in buf_score)
-                    {
-                        List<int> level_list = query.cutoff.Keys.ToList();
-                        level_list.Sort();
-                        foreach (int level in level_list) {
-                            //if (cs.Value.score > query.cutoff[query.low_cutoff_level])
-                            if (cs.Value.score > query.cutoff[level])
-                            {
-                                cutoff_score[cs.Key] = cs.Value;
-                                cutoff_score[cs.Key].N_score = query.exam_Nscore(level, cs.Value);
-                                cutoff_score[cs.Key].over_level = level;
-                            }
-                        }
-                    }
-                    if (cutoff_score.Count > 0)
-                    {
-                        EF.WriteLine(entry.Value.title);
-                        EF.WriteLine(entry.Value.main);
-                        //Console.WriteLine("エントリー名" + fasta_title[index] + "vs" + "モチーフタイトル" + query.title.ToString() + "AC=" + query.ac.ToString());
-
-                        writer.WriteLine(entry.Value.title + " vs " + query.title.ToString() + "AC=" + query.ac.ToString());
-                        top.WriteLine("");
-                        top.WriteLine(entry.Value.title + " vs " + query.title.ToString() + "AC=" + query.ac.ToString());
-                        int old_key = 0;
-                        Dictionary<int, int> well = new Dictionary<int, int>();
-                        int well_key = 0;
-                        int well_score = 0;
-                        Score wel = new Score(0, "");
-                        foreach (KeyValuePair<int, Score> s in cutoff_score)
-                        {
-                            //if (((s.Key - old_key > 1) || (s.Value.end != wel.end))  && old_key != 0)
-                            if (s.Value.end != wel.end && old_key != 0)
-                            {
-                                //Console.WriteLine();
-                                well[well_key] = well_score;
-                                well_score = s.Value.score;
-                                well_key = s.Key;
-                                wel = s.Value;
-                            }
-                            old_key = s.Key;
-                            if (s.Value.score > well_score)
-                            {
-                                well_key = s.Key;
-                                well_score = s.Value.score;
-                                wel = s.Value;
-                            }
-                            //Console.WriteLine("開始位置=" .Key + "\tスコア=" + s.Value.score+ "\tNスコア=" + s.Value.N_score + "\t文字列 " + s.Value.score_str);
-                            //Console.WriteLine("開始位置=" + s.K+ sey + "\tスコア=" + s.Value.well_score + "\tNスコア=" + s.Value.N_score + "\t文字列 " + s.Value.well_score_str);
+            
 
 
 
-                        }
-                        well[well_key] = well_score;
-                        Score old = new Score(0, "");
-                        foreach (KeyValuePair<int, Score> s in cutoff_score)
-                        {
-                            //if (((s.Key - old_key) > 1 || wel.end != s.Value.end) && old_key != 0 )
-                            if (old.end != s.Value.end && old_key != 0)
-                            {
-                                writer.WriteLine("");
-                            }
-                            old_key = s.Key;
 
-                            //Console.WriteLine("開始位置=" + s.Key + "\tスコア=" + s.Value.score+ "\tNスコア=" + s.Value.N_score + "\t文字列 " + s.Value.score_str);
-                            if (!well.ContainsKey(s.Key))
-                            {
-                                //Console.WriteLine("\t開始位置=" + s.Key + "\tスコア=" + s.Value.score + "\tNスコア=" + s.Value.N_score + "\t文字列 " + s.Value.score_str);
-                                //writer.WriteLine(" 開始位置=" + s.Key + "\tスコア=" + s.Value.score + "\tNスコア=" + s.Value.N_score + "\t文字列 " + s.Value.score_str);
-                                writer.WriteLine(" " + s.Value.start + "-" + s.Value.end + "\tScore=" + s.Value.score + "\tNScore=" + s.Value.N_score + "\tString " + s.Value.score_str);
-                            }
-                            else
-                            {
-                                if (!best_score.ContainsKey(s.Key))
-                                {
-                                    best_score[s.Key] = new Dictionary<string, Score>();
-                                }
-                                if (!best_score[s.Key].ContainsKey(query.title.ToString()))
-                                {
-                                    best_score[s.Key][query.title.ToString()] = s.Value;
-                                }
-                                //best_score[s.Key][query.title.ToString()].Add(s.Value);
-                                //Console.WriteLine(" 開始位置=" + s.Key + "\tスコア=" + s.Value.score + "\tNスコア=" + s.Value.N_score + "\t文字列 " + s.Value.score_str);
-                                writer.WriteLine("*" + s.Value.start + "-" + s.Value.end + "\tScore=" + s.Value.score + "\tNScore=" + s.Value.N_score + "\tString " + s.Value.score_str);
-                                top.WriteLine("*" + s.Value.start + "-" + s.Value.end +"\tLevel="+ s.Value.over_level+ "\tScore=" + s.Value.score + "\tNScore=" + s.Value.N_score + "\tString " + s.Value.score_str);
-                                foreach(KeyValuePair<int,StreamWriter> top_le in top_level_dic)
-                                {
-                                    if(top_le.Key <= s.Value.over_level)
-                                    {
-                                        if (level_write[top_le.Key] == false)
-                                        {
-                                            top_le.Value.WriteLine(entry.Value.title);
-                                            level_write[top_le.Key] = true;
-                                        }
-                                        top_le.Value.WriteLine("*" + s.Value.start + "-" + s.Value.end + "\tLevel=" + s.Value.over_level + "\tScore=" + s.Value.score + "\tNScore=" + s.Value.N_score + "\tString " + s.Value.score_str);
-                                    }
-                                }
 
-                            }
 
-                            old = s.Value;
+            //int e_in=-1;
+            //Dictionary<int, StreamWriter> top_level_dic = new Dictionary<int, StreamWriter>();
+            //top_level_dic[0] =  new StreamWriter(@"top_level0.txt", false, System.Text.Encoding.GetEncoding("utf-8"));
+            //top_level_dic[-1] = new StreamWriter(@"top_level-1.txt", false, System.Text.Encoding.GetEncoding("utf-8"));
+            ////for (int i = 0; i < fasta.Count; i++)
+            //foreach (KeyValuePair<string, Entry> entry in entrys)
+            //{
+            //    e_in++;
+            //    score_list[score_list.Count] = new Dictionary<int, Dictionary<int, Score>>();
+            //    int m_in = -1;
+            //    Dictionary<int, Dictionary<string, Score>> best_score = new Dictionary<int, Dictionary<string, Score>>();
+            //    foreach (Motif query in motif)
+            //    {
+            //        m_in++;
+            //        //Console.Write(i + " / " + fasta.Count + "  " + m_in + " / " + motif.Count);
+            //        //Console.WriteLine("エントリー名" + fasta_title[i] + "vs" + "モチーフタイトル" + query.title.ToString() + "AC=" + query.ac.ToString());
+            //        Console.Write(e_in + " / " + entrys.Count + "  " + m_in + " / " + motif.Count);
+            //        Console.WriteLine("エントリー名" + entry.Value.title+ "vs" + "モチーフタイトル" + query.title.ToString() + "AC=" + query.ac.ToString());
+            //        Dictionary<int , bool> level_write = new Dictionary<int, bool>();
+            //        level_write[0] = false;
+            //        level_write[-1] = false;
+            //        System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
+            //        Dictionary<int, Score> cutoff_score = new Dictionary<int, Score>();
 
-                        }
+            //        //上の流用
+            //        string resfolder = "result";
 
-                        //sw.Stop();
-                        //alltime += sw.Elapsed;
-                        //Console.WriteLine("処理時間:" + sw.Elapsed + "合計時間:" + alltime.Elapsed);
-                        //Debug.WriteLine("処理時間:" + sw.Elapsed + "合計時間:" + alltime);
+            //        resfolder = System.IO.Path.Combine("result", entry.Value.id);
+            //        string resfile = System.IO.Path.Combine(resfolder, query.ac.ToString() + ".out");
+            //        Dictionary<int, Score> buf_score = new Dictionary<int, Score>();
+            //        Console.WriteLine(resfile);
+            //        if (File.Exists(resfile))
+            //        {
+            //            //sco[entry.Value.title.ToString()][query.title.ToString()] = Score.read_result(resfile);
+            //            buf_score = Score.read_result(resfile);
+            //        }
+            //        else
+            //        {
+            //            //sco[entry.Value.title.ToString()][query.title.ToString()] = new Dictionary<int, Score>();
+            //            buf_score = Score.read_result(resfile);
+            //        }
+            //        //上の流用
 
-                    }
+            //        //foreach (KeyValuePair<int, Score> cs in sco[entry.Value.title.ToString()][query.title.ToString()])
+            //        foreach (KeyValuePair<int, Score> cs in buf_score)
+            //        {
+            //            List<int> level_list = query.cutoff.Keys.ToList();
+            //            level_list.Sort();
+            //            foreach (int level in level_list) {
+            //                //if (cs.Value.score > query.cutoff[query.low_cutoff_level])
+            //                if (cs.Value.score > query.cutoff[level])
+            //                {
+            //                    cutoff_score[cs.Key] = cs.Value;
+            //                    cutoff_score[cs.Key].N_score = query.exam_Nscore(level, cs.Value);
+            //                    cutoff_score[cs.Key].over_level = level;
+            //                }
+            //            }
+            //        }
+            //        if (cutoff_score.Count > 0)
+            //        {
+            //            EF.WriteLine(entry.Value.title);
+            //            EF.WriteLine(entry.Value.main);
+            //            //Console.WriteLine("エントリー名" + fasta_title[index] + "vs" + "モチーフタイトル" + query.title.ToString() + "AC=" + query.ac.ToString());
 
-                    //score_list[score_list.Count - 1][score_list[score_list.Count - 1].Count].Clear();
-                    sw.Stop();
-                    //alltime += sw.Elapsed;
-                    Console.WriteLine("処理時間:" + sw.Elapsed + "合計時間:" + alltime.Elapsed);
-                    //Debug.WriteLine("処理時間:" + sw.Elapsed + "合計時間:" + alltime);
-                }
-                foreach (KeyValuePair<int, Dictionary<string, Score>> best in best_score)
-                {
-                    if (best.Value.Count > 1)
-                    {
-                        two_best.WriteLine(entry.Value.title);
-                        foreach (KeyValuePair<string, Score> s in best.Value)
-                        {
-                            two_best.WriteLine(s.Key + "\t" + s.Value.start + "-" + s.Value.end + "\tスコア=" + s.Value.score + "\tNスコア=" + s.Value.N_score + "\t文字列 " + s.Value.score_str);
-                        }
-                    }
-                }
-            }
-            two_best.Close();
-            alltime.Stop();
-            //Console.WriteLine(alltime.Days + "日" + alltime.Hours + "時" + alltime.Minutes + "分" + alltime.Seconds + "秒"  );
-            //Dictionary<int,Score> ef_score = ef_hand.ExamScore(fasta.ToString());
-            writer.Close();
-            top.Close();
+            //            writer.WriteLine(entry.Value.title + " vs " + query.title.ToString() + "AC=" + query.ac.ToString());
+            //            top.WriteLine("");
+            //            top.WriteLine(entry.Value.title + " vs " + query.title.ToString() + "AC=" + query.ac.ToString());
+            //            int old_key = 0;
+            //            Dictionary<int, int> well = new Dictionary<int, int>();
+            //            int well_key = 0;
+            //            int well_score = 0;
+            //            Score wel = new Score(0, "");
+            //            foreach (KeyValuePair<int, Score> s in cutoff_score)
+            //            {
+            //                //if (((s.Key - old_key > 1) || (s.Value.end != wel.end))  && old_key != 0)
+            //                if (s.Value.end != wel.end && old_key != 0)
+            //                {
+            //                    //Console.WriteLine();
+            //                    well[well_key] = well_score;
+            //                    well_score = s.Value.score;
+            //                    well_key = s.Key;
+            //                    wel = s.Value;
+            //                }
+            //                old_key = s.Key;
+            //                if (s.Value.score > well_score)
+            //                {
+            //                    well_key = s.Key;
+            //                    well_score = s.Value.score;
+            //                    wel = s.Value;
+            //                }
+            //                //Console.WriteLine("開始位置=" .Key + "\tスコア=" + s.Value.score+ "\tNスコア=" + s.Value.N_score + "\t文字列 " + s.Value.score_str);
+            //                //Console.WriteLine("開始位置=" + s.K+ sey + "\tスコア=" + s.Value.well_score + "\tNスコア=" + s.Value.N_score + "\t文字列 " + s.Value.well_score_str);
+
+
+
+            //            }
+            //            well[well_key] = well_score;
+            //            Score old = new Score(0, "");
+            //            foreach (KeyValuePair<int, Score> s in cutoff_score)
+            //            {
+            //                //if (((s.Key - old_key) > 1 || wel.end != s.Value.end) && old_key != 0 )
+            //                if (old.end != s.Value.end && old_key != 0)
+            //                {
+            //                    writer.WriteLine("");
+            //                }
+            //                old_key = s.Key;
+
+            //                //Console.WriteLine("開始位置=" + s.Key + "\tスコア=" + s.Value.score+ "\tNスコア=" + s.Value.N_score + "\t文字列 " + s.Value.score_str);
+            //                if (!well.ContainsKey(s.Key))
+            //                {
+            //                    //Console.WriteLine("\t開始位置=" + s.Key + "\tスコア=" + s.Value.score + "\tNスコア=" + s.Value.N_score + "\t文字列 " + s.Value.score_str);
+            //                    //writer.WriteLine(" 開始位置=" + s.Key + "\tスコア=" + s.Value.score + "\tNスコア=" + s.Value.N_score + "\t文字列 " + s.Value.score_str);
+            //                    writer.WriteLine(" " + s.Value.start + "-" + s.Value.end + "\tScore=" + s.Value.score + "\tNScore=" + s.Value.N_score + "\tString " + s.Value.score_str);
+            //                }
+            //                else
+            //                {
+            //                    if (!best_score.ContainsKey(s.Key))
+            //                    {
+            //                        best_score[s.Key] = new Dictionary<string, Score>();
+            //                    }
+            //                    if (!best_score[s.Key].ContainsKey(query.title.ToString()))
+            //                    {
+            //                        best_score[s.Key][query.title.ToString()] = s.Value;
+            //                    }
+            //                    //best_score[s.Key][query.title.ToString()].Add(s.Value);
+            //                    //Console.WriteLine(" 開始位置=" + s.Key + "\tスコア=" + s.Value.score + "\tNスコア=" + s.Value.N_score + "\t文字列 " + s.Value.score_str);
+            //                    writer.WriteLine("*" + s.Value.start + "-" + s.Value.end + "\tScore=" + s.Value.score + "\tNScore=" + s.Value.N_score + "\tString " + s.Value.score_str);
+            //                    top.WriteLine("*" + s.Value.start + "-" + s.Value.end +"\tLevel="+ s.Value.over_level+ "\tScore=" + s.Value.score + "\tNScore=" + s.Value.N_score + "\tString " + s.Value.score_str);
+            //                    foreach(KeyValuePair<int,StreamWriter> top_le in top_level_dic)
+            //                    {
+            //                        if(top_le.Key <= s.Value.over_level)
+            //                        {
+            //                            if (level_write[top_le.Key] == false)
+            //                            {
+            //                                top_le.Value.WriteLine(entry.Value.title);
+            //                                level_write[top_le.Key] = true;
+            //                            }
+            //                            top_le.Value.WriteLine("*" + s.Value.start + "-" + s.Value.end + "\tLevel=" + s.Value.over_level + "\tScore=" + s.Value.score + "\tNScore=" + s.Value.N_score + "\tString " + s.Value.score_str);
+            //                        }
+            //                    }
+
+            //                }
+
+            //                old = s.Value;
+
+            //            }
+
+            //            //sw.Stop();
+            //            //alltime += sw.Elapsed;
+            //            //Console.WriteLine("処理時間:" + sw.Elapsed + "合計時間:" + alltime.Elapsed);
+            //            //Debug.WriteLine("処理時間:" + sw.Elapsed + "合計時間:" + alltime);
+
+            //        }
+
+            //        //score_list[score_list.Count - 1][score_list[score_list.Count - 1].Count].Clear();
+            //        sw.Stop();
+            //        //alltime += sw.Elapsed;
+            //        Console.WriteLine("処理時間:" + sw.Elapsed + "合計時間:" + alltime.Elapsed);
+            //        //Debug.WriteLine("処理時間:" + sw.Elapsed + "合計時間:" + alltime);
+            //    }
+            //    foreach (KeyValuePair<int, Dictionary<string, Score>> best in best_score)
+            //    {
+            //        if (best.Value.Count > 1)
+            //        {
+            //            two_best.WriteLine(entry.Value.title);
+            //            foreach (KeyValuePair<string, Score> s in best.Value)
+            //            {
+            //                two_best.WriteLine(s.Key + "\t" + s.Value.start + "-" + s.Value.end + "\tスコア=" + s.Value.score + "\tNスコア=" + s.Value.N_score + "\t文字列 " + s.Value.score_str);
+            //            }
+            //        }
+            //    }
+            //}
+            //two_best.Close();
+            //alltime.Stop();
+            ////Console.WriteLine(alltime.Days + "日" + alltime.Hours + "時" + alltime.Minutes + "分" + alltime.Seconds + "秒"  );
+            ////Dictionary<int,Score> ef_score = ef_hand.ExamScore(fasta.ToString());
+            //writer.Close();
+            //top.Close();
 
 
         }

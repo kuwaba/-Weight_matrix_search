@@ -16,7 +16,8 @@ namespace motiflength
             Encoding utf8Enc = Encoding.UTF8;
             StreamWriter writer =
               new StreamWriter(@"result.txt", false, System.Text.Encoding.GetEncoding("Shift_JIS"));
-            Console.SetOut(writer);
+            
+            //Console.SetOut(writer);
             //writer.WriteLine("テスト書き込みです。");
             List < StringBuilder> fasta = new List<StringBuilder>();
             StringBuilder profile = new StringBuilder();
@@ -114,6 +115,11 @@ namespace motiflength
                     kind.Clear();
                     
                 }
+                foreach(Motif mot in motif)
+                {
+                    writer.WriteLine(mot.title + "," + mot.kind);
+                }
+
                 foreach (KeyValuePair<string, int> k in kind)
                 {
                     Console.WriteLine(k.Key + "," + k.Value);

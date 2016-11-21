@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sample01
+namespace Score_exam
 {
     class Score
     {
@@ -82,21 +82,22 @@ namespace Sample01
                     {
                         Score buf_score = new Score(0, "");
                         string[] score_line = line.Split('\t');
+                        if (score_line.Count() > 4)
+                        {
+                            string[] start_end = score_line[0].Split('-');
+                            buf_score.start = Int32.Parse(start_end[0].Substring(1, start_end[0].Length - 1));
+                            buf_score.end = Int32.Parse(start_end[1].Substring(0, start_end[1].Length));
 
-                        string[] start_end = score_line[0].Split('-');
-                        buf_score.start =  Int32.Parse( start_end[0].Substring(1, start_end[0].Length-1));
-                        buf_score.end = Int32.Parse(start_end[1].Substring(0, start_end[1].Length));
+                            buf_score.over_level = Int32.Parse(score_line[1].Split('=')[1]);
 
-                        buf_score.over_level = Int32.Parse(score_line[1].Split('=')[1]);
+                            buf_score.score = Int32.Parse(score_line[2].Split('=')[1]);
 
-                        buf_score.score = Int32.Parse(score_line[2].Split('=')[1]);
+                            buf_score.N_score = Double.Parse(score_line[3].Split('=')[1]);
 
-                        buf_score.N_score = Double.Parse(score_line[3].Split('=')[1]);
+                            buf_score.score_str = score_line[4].Split(' ')[1];
 
-                        buf_score.score_str = score_line[4].Split(' ')[1];
-
-                        result[protein_name][buf_score.start] = buf_score;
-
+                            result[protein_name][buf_score.start] = buf_score;
+                        }
                     }
                 }
             }
@@ -138,6 +139,8 @@ namespace Sample01
                         buf_score.score_str = score_line[1];
 
                         result[protein_name][buf_score.start] = buf_score;
+                        buf_score.start = buf_score.start + 1;
+                        buf_score.end = buf_score.end + 1;
 
                     }
                 }

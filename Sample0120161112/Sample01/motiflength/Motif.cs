@@ -32,6 +32,7 @@ namespace motiflength
         public int max_cutoff_level = -1;
         public int max_cutoff;
         public int max_score = 0;
+        public string name;
         public Dictionary<int,int> cutoff_score_list = new Dictionary<int, int>();
         public Dictionary<int, int> max_score_list = new Dictionary<int, int>();
         public Dictionary<string, int> default_score_I= new Dictionary<string, int>(){
@@ -65,6 +66,7 @@ namespace motiflength
                     if ((line.IndexOf("ID") == 0))
                     {
                         title.Append(line.Substring(5).Split(';')[0]);
+                        name = title.ToString().Split('_')[title.ToString().Split('_').Length - 1];
                         kind.Append(line.Substring(5).Split(';')[1]);
 
                     }
