@@ -23,7 +23,7 @@ namespace Sample01
               new StreamWriter(@"tow_best.txt", false, System.Text.Encoding.GetEncoding("utf-8"));
             StreamWriter test =
               new StreamWriter(@"test_aa.txt", false, System.Text.Encoding.GetEncoding("utf-8"));
-            
+
             StreamWriter top = new StreamWriter(@"top.txt", false, System.Text.Encoding.GetEncoding("utf-8"));
             StreamWriter cut = new StreamWriter(@"cut.txt", false, System.Text.Encoding.GetEncoding("utf-8"));
             //Console.SetOut(writer);
@@ -53,7 +53,7 @@ namespace Sample01
                     string line;
                     StringBuilder buf_title = new StringBuilder();
                     StringBuilder buf_main = new StringBuilder();
-                    String buf_id="test" ;
+                    String buf_id = "test";
                     int a = 0;
                     while ((line = r.ReadLine()) != null) // 1行ずつ読み出し。
                     {
@@ -87,13 +87,13 @@ namespace Sample01
                             }
                             else
                             {
-                                buf_id = Entry.ValidFileName( buf_title.ToString());
+                                buf_id = Entry.ValidFileName(buf_title.ToString());
                             }
-                            
+
                             a = 1;
                         }
                         else
-                        {                           
+                        {
                             //fasta[fasta.Count - 1].Append(line);
                             buf_main.Append(line);
                         }
@@ -104,7 +104,7 @@ namespace Sample01
                 }
             }
 
-            foreach(KeyValuePair<string,Entry> e in entrys)
+            foreach (KeyValuePair<string, Entry> e in entrys)
             {
                 test.Write(e.Value.id);
             }
@@ -155,13 +155,13 @@ namespace Sample01
             {
                 motif.Add(new Motif(f_m.ToString()));
             }
-            
+
             int index = 0;
             System.Diagnostics.Stopwatch alltime = System.Diagnostics.Stopwatch.StartNew();
 
             Dictionary<string, Dictionary<string, Dictionary<int, Score>>> sco = new Dictionary<string, Dictionary<string, Dictionary<int, Score>>>();
             //for (int i = 0; i < fasta.Count; i++)
-            foreach(KeyValuePair<string,Entry> entry in entrys)
+            foreach (KeyValuePair<string, Entry> entry in entrys)
             {
 
                 foreach (Motif query in motif)
@@ -183,7 +183,7 @@ namespace Sample01
             {
                 cnt++;
                 string resfolder = "result";
-                
+
                 resfolder = System.IO.Path.Combine("result", entry.Value.id);
                 if (!Directory.Exists(resfolder))
                 {
@@ -265,62 +265,71 @@ namespace Sample01
             {
                 Directory.CreateDirectory("result");
             }
-           
+
 
             ParallelOptions options = new ParallelOptions();
             options.MaxDegreeOfParallelism = 8;
             //int all = fasta.Count * motif.Count;
-            int all = entrys.Count* motif.Count;
+            int all = entrys.Count * motif.Count;
             int n = 0;
             Console.Write("fasta" + entrys.Count + "title" + fasta_title.Count);
-            Parallel.ForEach(entrys,options, entry =>
-            {
+            Parallel.ForEach(entrys, options, entry =>
+             {
 
-                string resfolder = "result";                               
-                resfolder = System.IO.Path.Combine("result", entry.Value.id);
+                 string resfolder = "result";
+                 resfolder = System.IO.Path.Combine("result", entry.Value.id);
 
-                foreach (Motif query in motif)
-                {
+                 foreach (Motif query in motif)
+                 {
 
-                    Console.WriteLine(n + "/" + all + " " + entry.Value.title.ToString() + " vs " + query.ac.ToString() + query.title.ToString());
-                    string resfile = System.IO.Path.Combine(resfolder, query.ac.ToString() + ".out");
-                    Dictionary<int, Score> buf_score = new Dictionary<int, Score>();
-                    Console.WriteLine(entry.Value.main.ToString());
-                    if (File.Exists(resfile))
-                    {
+                     Console.WriteLine(n + "/" + all + " " + entry.Value.title.ToString() + " vs " + query.ac.ToString() + query.title.ToString());
+                     string resfile = System.IO.Path.Combine(resfolder, query.ac.ToString() + ".out");
+                     Dictionary<int, Score> buf_score = new Dictionary<int, Score>();
+                     Console.WriteLine(entry.Value.main.ToString());
+                     if (File.Exists(resfile))
+                     {
                         //sco[fasta_title[i].ToString()][query.title.ToString()] = Score.read_result(resfile);
                         buf_score = Score.read_result(resfile);
-                    }
-                    else
-                    {
+                     }
+                     else
+                     {
                         //sco[fasta_title[i].ToString()][query.title.ToString()] = new Dictionary<int, Score>();
                         //以下一時的にコメント
                         buf_score = query.ExamScore(entry.Value.main.ToString());
-                        string resoutfile = System.IO.Path.Combine(resfolder, query.ac.ToString() + ".out");
-                        StreamWriter p_m_result =
-                            new StreamWriter(resoutfile, false, Encoding.GetEncoding("utf-8"));
-                        p_m_result.WriteLine("protein,motif,start,end,score,string");
+                         string resoutfile = System.IO.Path.Combine(resfolder, query.ac.ToString() + ".out");
+
+                         StringBuilder f_out = new StringBuilder();
+                         f_out.AppendLine("protein,motif,start,end,score,string");
+                        //p_m_result.WriteLine("protein,motif,start,end,score,string");
                         //foreach (KeyValuePair<int, Score> s in sco[fasta_title[i].ToString()][query.title.ToString()])
                         foreach (KeyValuePair<int, Score> s in buf_score)
-                        {
+                         {
                             //if (s.Value.score > query.cutoff[query.low_cutoff_level])
-                            if (query.exam_Nscore(query.low_cutoff_level,s.Value) > 0)
-                            {
-                                p_m_result.WriteLine(entry.Value.id + "," + query.ac.ToString() + "," + s.Value.start + "," + s.Value.end + "," + s.Value.score + "," + s.Value.score_str);
+                            if (query.exam_Nscore(query.low_cutoff_level, s.Value) > 0)
+                             {
+                                 f_out.AppendLine(entry.Value.id + "," + query.ac.ToString() + "," + s.Value.start + "," + s.Value.end + "," + s.Value.score + "," + s.Value.score_str);
+                                //p_m_result.WriteLine(entry.Value.id + "," + query.ac.ToString() + "," + s.Value.start + "," + s.Value.end + "," + s.Value.score + "," + s.Value.score_str);
                             }
-                        }
-                        p_m_result.Close();
-                    }
-                    n++;
+                         }
+                        //cut.Write(f_out);
+                        //cut.Close();
+                        StreamWriter p_m_result =
+                             new StreamWriter(resoutfile, false, Encoding.GetEncoding("utf-8"));
+                         p_m_result.Write(f_out);
+                         p_m_result.Close();
+                     }
+                     n++;
 
-                    Console.WriteLine(alltime.Elapsed);
-                }
+                     Console.WriteLine(alltime.Elapsed);
+                 }
 
-            });
+             });
             Console.WriteLine(alltime.Elapsed);
 
-            int e_in=-1;
-
+            int e_in = -1;
+            Dictionary<int, StreamWriter> top_level_dic = new Dictionary<int, StreamWriter>();
+            top_level_dic[0] = new StreamWriter(@"top_level0.txt", false, System.Text.Encoding.GetEncoding("utf-8"));
+            top_level_dic[-1] = new StreamWriter(@"top_level-1.txt", false, System.Text.Encoding.GetEncoding("utf-8"));
             //for (int i = 0; i < fasta.Count; i++)
             foreach (KeyValuePair<string, Entry> entry in entrys)
             {
@@ -334,13 +343,16 @@ namespace Sample01
                     //Console.Write(i + " / " + fasta.Count + "  " + m_in + " / " + motif.Count);
                     //Console.WriteLine("エントリー名" + fasta_title[i] + "vs" + "モチーフタイトル" + query.title.ToString() + "AC=" + query.ac.ToString());
                     Console.Write(e_in + " / " + entrys.Count + "  " + m_in + " / " + motif.Count);
-                    Console.WriteLine("エントリー名" + entry.Value.title+ "vs" + "モチーフタイトル" + query.title.ToString() + "AC=" + query.ac.ToString());
+                    Console.WriteLine("エントリー名" + entry.Value.title + "vs" + "モチーフタイトル" + query.title.ToString() + "AC=" + query.ac.ToString());
+                    Dictionary<int, bool> level_write = new Dictionary<int, bool>();
+                    level_write[0] = false;
+                    level_write[-1] = false;
                     System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
                     Dictionary<int, Score> cutoff_score = new Dictionary<int, Score>();
 
                     //上の流用
                     string resfolder = "result";
-                    
+
                     resfolder = System.IO.Path.Combine("result", entry.Value.id);
                     string resfile = System.IO.Path.Combine(resfolder, query.ac.ToString() + ".out");
                     Dictionary<int, Score> buf_score = new Dictionary<int, Score>();
@@ -362,7 +374,8 @@ namespace Sample01
                     {
                         List<int> level_list = query.cutoff.Keys.ToList();
                         level_list.Sort();
-                        foreach (int level in level_list) {
+                        foreach (int level in level_list)
+                        {
                             //if (cs.Value.score > query.cutoff[query.low_cutoff_level])
                             if (cs.Value.score > query.cutoff[level])
                             {
@@ -441,7 +454,19 @@ namespace Sample01
                                 //best_score[s.Key][query.title.ToString()].Add(s.Value);
                                 //Console.WriteLine(" 開始位置=" + s.Key + "\tスコア=" + s.Value.score + "\tNスコア=" + s.Value.N_score + "\t文字列 " + s.Value.score_str);
                                 writer.WriteLine("*" + s.Value.start + "-" + s.Value.end + "\tScore=" + s.Value.score + "\tNScore=" + s.Value.N_score + "\tString " + s.Value.score_str);
-                                top.WriteLine("*" + s.Value.start + "-" + s.Value.end +"\tLevel="+ s.Value.over_level+ "\tScore=" + s.Value.score + "\tNScore=" + s.Value.N_score + "\tString " + s.Value.score_str);
+                                top.WriteLine("*" + s.Value.start + "-" + s.Value.end + "\tLevel=" + s.Value.over_level + "\tScore=" + s.Value.score + "\tNScore=" + s.Value.N_score + "\tString " + s.Value.score_str);
+                                foreach (KeyValuePair<int, StreamWriter> top_le in top_level_dic)
+                                {
+                                    if (top_le.Key <= s.Value.over_level)
+                                    {
+                                        if (level_write[top_le.Key] == false)
+                                        {
+                                            top_le.Value.WriteLine(entry.Value.title);
+                                            level_write[top_le.Key] = true;
+                                        }
+                                        top_le.Value.WriteLine("*" + s.Value.start + "-" + s.Value.end + "\tLevel=" + s.Value.over_level + "\tScore=" + s.Value.score + "\tNScore=" + s.Value.N_score + "\tString " + s.Value.score_str);
+                                    }
+                                }
 
                             }
 
@@ -480,8 +505,11 @@ namespace Sample01
             //Dictionary<int,Score> ef_score = ef_hand.ExamScore(fasta.ToString());
             writer.Close();
             top.Close();
+            foreach (KeyValuePair<int, StreamWriter> top_le in top_level_dic)
+            {
+                top_le.Value.Close();
 
-
+            }
         }
 
     }

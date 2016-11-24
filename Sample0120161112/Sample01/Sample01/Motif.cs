@@ -370,7 +370,8 @@ namespace Sample01
             if (function[mode].Equals("LINEAR"))
             {
                 //m_score.N_score = R1 + (R2 * m_score.start_score_list[index]);
-                N_score = R1[mode] + (R2[mode] * s.score);
+                N_score = (double)R1[mode] + ((double)R2[mode] * (double)s.score);
+                
             }
             else if (function[mode].Equals("GLE_ZSCORE"))
             {

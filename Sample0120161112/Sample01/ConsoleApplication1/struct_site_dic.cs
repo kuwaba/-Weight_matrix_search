@@ -12,15 +12,17 @@ namespace Score_exam
         const string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
         public Dictionary<string, Dictionary<string, struct_site>> struct_site_list { get; set; }
-
+        public Dictionary<string, Dictionary<String, Dictionary<int, int>>> seq_amino = new Dictionary<string, Dictionary<String, Dictionary<int, int>>>();
+        public Dictionary<string, struct_conf_list> struct_conf_dic = new Dictionary<string, struct_conf_list>();
         public struct_site_dic()
         {
             struct_site_list = new Dictionary<string, Dictionary<string, struct_site>>();
-            string[] pdb_fs = System.IO.Directory.GetFiles(@"PDB", "*", System.IO.SearchOption.AllDirectories);
+            string[] pdb_fs = System.IO.Directory.GetFiles(@"PDBEF", "*", System.IO.SearchOption.AllDirectories);
             //Console.WriteLine(pdb_fs.Length);
+
             
-            Dictionary<string, Dictionary<String, Dictionary<int, int>>> seq_amino = new Dictionary<string, Dictionary<String, Dictionary<int, int>>>();
             StreamWriter result = new StreamWriter(@"result.txt", false, System.Text.Encoding.GetEncoding("utf-8"));
+            
             foreach (string file_f in pdb_fs)
             {
                 using (StreamReader r = new StreamReader(file_f))
@@ -180,6 +182,97 @@ namespace Score_exam
 
 
                         }
+                        else if (cif_part.IndexOf("_struct_conf.") >= 0)
+                        {
+                            struct_conf_dic[name] = new struct_conf_list();
+                            string[] lines = cif_part.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                            //Console.WriteLine(lines[1]);
+                            if (lines[1].IndexOf("loop") != 0)
+                            {
+                                Dictionary<string, string> struct_conf = new Dictionary<string, string>();
+
+                                //foreach (string line in lines)
+                                for (int i = 1; i < lines.Length; i++)
+                                {
+                                    string line = lines[i];
+                                    string[] line_sp = line.Split(new string[] { " " }, 2, StringSplitOptions.RemoveEmptyEntries);
+                                    struct_conf[line_sp[0]] = line_sp[1].Trim();
+                                }
+                                struct_conf s_c = new struct_conf();
+                                s_c.beg_auth_asym_id = struct_conf["_struct_conf.beg_auth_asym_id"];
+                                s_c.beg_auth_seq_id = Int32.Parse(struct_conf["_struct_conf.beg_auth_seq_id"]);
+                                s_c.end_auth_seq_id = Int32.Parse(struct_conf["_struct_conf.end_auth_seq_id"]);
+                                s_c.conf_type_id = struct_conf["_struct_conf.conf_type_id"];
+                                s_c.end_auth_asym_id = struct_conf["_struct_conf.end_auth_asym_id"];
+                                struct_conf_dic[name].s_c_list.Add(s_c);
+                            }
+                            else
+                            {
+                                int beg_auth_asym_id_index = 0;
+                                int beg_auth_seq_id_index = 0;
+                                int end_auth_asym_id_index = 0;
+                                int end_auth_seq_id_index = 0;
+                                int conf_type_id_index = 0;
+
+                                //foreach (string line in lines)
+                                for (int i = 0; i < lines.Length; i++)
+                                {
+                                    string line = lines[i];
+                                    if (line.IndexOf("beg_auth_asym_id") > 0)
+                                    {
+                                        beg_auth_asym_id_index = i-2;
+                                    }else if (line.IndexOf("beg_auth_seq_id") > 0)
+                                    {
+                                        beg_auth_seq_id_index = i-2;
+                                    }
+                                    else if (line.IndexOf("end_auth_asym_id") > 0)
+                                    {
+                                        end_auth_asym_id_index = i - 2;
+                                    }
+                                    else if (line.IndexOf("end_auth_seq_id") > 0)
+                                    {
+                                        end_auth_seq_id_index = i - 2;
+                                    }
+                                    else if (line.IndexOf("conf_type_id") > 0)
+                                    {
+                                        conf_type_id_index = i - 2;
+                                    }
+                                    if (line.IndexOf("_") != 0 && line.IndexOf("loop") == -1 && line.Trim().Length > 2)
+                                    {
+                                        string[] line_sp = line.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                                        if (line_sp.Length >= 3)
+                                        {
+                                            StringBuilder dete = new StringBuilder();
+                                            //Console.WriteLine(line_sp.Length);
+                                            for (int j = 1; j < line_sp.Length - 1; j++)
+                                            {
+                                                dete.Append(line_sp[j] + " ");
+                                            }
+                                            //Console.WriteLine(line_sp[0]);
+                                            struct_conf s_c = new struct_conf();
+                                            s_c.beg_auth_asym_id = line_sp[beg_auth_asym_id_index];
+                                            s_c.beg_auth_seq_id = Int32.Parse(line_sp[beg_auth_seq_id_index]);
+                                            s_c.end_auth_seq_id = Int32.Parse(line_sp[end_auth_seq_id_index]);
+                                            s_c.conf_type_id = line_sp[conf_type_id_index];
+                                            s_c.end_auth_asym_id = line_sp[end_auth_asym_id_index];
+                                            struct_conf_dic[name].s_c_list.Add(s_c);
+                                        }
+                                        else
+                                        {
+                                           
+
+
+                                        }
+
+                                    }
+                                }
+                            }
+                        }
+
+
+
+
+
                     }
 
 
@@ -219,5 +312,21 @@ namespace Score_exam
 
 
         }
+
+        public string struct_conf_type(string protein_name,string asym_id,int amino_no)
+        {
+            string ret_conf = "*";
+            if (seq_amino.ContainsKey(protein_name) && seq_amino[protein_name].ContainsKey(asym_id) && seq_amino[protein_name][asym_id].ContainsKey(amino_no))
+            {
+                int seq_no = seq_amino[protein_name][asym_id][amino_no];
+                if (struct_conf_dic.ContainsKey(protein_name))
+                {
+                    ret_conf = struct_conf_dic[protein_name].return_struct(seq_no, asym_id);
+                }
+            }
+            
+            return ret_conf;
+        }
+
     }
 }
