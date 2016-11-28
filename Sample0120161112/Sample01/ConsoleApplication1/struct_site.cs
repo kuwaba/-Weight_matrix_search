@@ -84,7 +84,7 @@ namespace Score_exam
             }
             else
             {
-                Console.WriteLine(id + "#" + details + "#" + "#" + auth_asym_id + "#" + auth_seq_id + "#" + amino_id + "#" + this.comp_list());
+                //Console.WriteLine(id + "#" + details + "#" + "#" + auth_asym_id + "#" + auth_seq_id + "#" + amino_id + "#" + this.comp_list());
                 return id + "#" + details + "#" + "#" + auth_asym_id + "#" + auth_seq_id + "#" + amino_id;
             }
         }

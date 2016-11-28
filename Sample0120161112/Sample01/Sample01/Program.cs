@@ -407,28 +407,47 @@ namespace Sample01
                         top.WriteLine("");
                         top.WriteLine(entry.Value.title + " vs " + query.title.ToString() + "AC=" + query.ac.ToString());
                         int old_key = 0;
-                        Dictionary<int, int> well = new Dictionary<int, int>();
+                        Dictionary<int, int> well = new Dictionary<int, int>();//同じ終了地点の中で最も良いスコアのKey = 開始地点 value=終了地点
+                        //Dictionary<int, Score> well = new Dictionary<int, Score>();//同じ終了地点の中で最も良いスコアのKey = 終了地点 value=スコア
                         int well_key = 0;
                         int well_score = 0;
                         Score wel = new Score(0, "");
                         foreach (KeyValuePair<int, Score> s in cutoff_score)
                         {
+
+                            if (!well.ContainsValue(s.Value.end))
+                            {
+                                well[s.Value.start] = s.Value.end;
+                            }
+                            else 
+                            {
+                                int key = well.First(x => x.Value == s.Value.end).Key;
+                                if (cutoff_score[key].score < s.Value.score)
+                                {
+                                    well.Remove(key);
+                                    well[s.Value.start] = s.Value.end;
+                                }
+                                
+                            }
+                            well_score = s.Value.end;//名前ｔ使い方違う
+
+
                             //if (((s.Key - old_key > 1) || (s.Value.end != wel.end))  && old_key != 0)
-                            if (s.Value.end != wel.end && old_key != 0)
-                            {
-                                //Console.WriteLine();
-                                well[well_key] = well_score;
-                                well_score = s.Value.score;
-                                well_key = s.Key;
-                                wel = s.Value;
-                            }
-                            old_key = s.Key;
-                            if (s.Value.score > well_score)
-                            {
-                                well_key = s.Key;
-                                well_score = s.Value.score;
-                                wel = s.Value;
-                            }
+                            //if (s.Value.end != wel.end && old_key != 0)
+                            //{
+                            //    //Console.WriteLine();
+                            //    well[well_key] = well_score;
+                            //    well_score = s.Value.score;
+                            //    well_key = s.Key;
+                            //    wel = s.Value;
+                            //}
+                            //old_key = s.Key;
+                            //if (s.Value.score > well_score)
+                            //{
+                            //    well_key = s.Key;
+                            //    well_score = s.Value.score;
+                            //    wel = s.Value;
+                            //}
                             //Console.WriteLine("開始位置=" .Key + "\tスコア=" + s.Value.score+ "\tNスコア=" + s.Value.N_score + "\t文字列 " + s.Value.score_str);
                             //Console.WriteLine("開始位置=" + s.K+ sey + "\tスコア=" + s.Value.well_score + "\tNスコア=" + s.Value.N_score + "\t文字列 " + s.Value.well_score_str);
 

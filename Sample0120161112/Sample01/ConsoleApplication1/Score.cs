@@ -15,6 +15,7 @@ namespace Score_exam
         public int start;
         public int end;
         public int over_level = -100;
+        public bool overlap = false;
 
         public Score(int s, string s_str)
         {
@@ -140,7 +141,7 @@ namespace Score_exam
 
                         result[protein_name][buf_score.start] = buf_score;
                         buf_score.start = buf_score.start + 1;
-                        buf_score.end = buf_score.end + 1;
+                        //buf_score.end = buf_score.end;
 
                     }
                 }
